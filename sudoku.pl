@@ -84,6 +84,7 @@ fill_in(AllRegions) :-
    % Write length of remaining to loosely display progress.
   write('\r'), write_two_digits(OL), write(' '),
   is_one_through_nine(Best),
+  % Verify that new bindings do not conflict in other regions.
   verify_regions(Others),
   fill_in(Others).
 
@@ -190,12 +191,13 @@ is_one_through_nine(L) :-
   member(8, L),
   member(9, L).
 
-% check all bindings
+% check all regions for conflicts
 verify_regions([]).
 verify_regions([R|Rest]) :-
   verify_legal_bindings_set(R, []),
   verify_regions(Rest).
 
+% Verify that a region does not contain duplicated numbers.
 verify_legal_bindings_set([], _).
 verify_legal_bindings_set([X|Rest], N) :-
   number(X),
@@ -207,27 +209,18 @@ verify_legal_bindings_set([X|Rest], N) :-
   verify_legal_bindings_set(Rest, N).
 
 % Sample puzzles.
-% Easy puzzle.
-easy_puzzle([
-  [0, 2, 4], [0, 3, 8], [0, 7, 1], [0, 8, 7], [1, 0, 6], [1, 1, 7], [1, 3, 9],
-  [2, 0, 5], [2, 2, 8], [2, 4, 3], [2, 8, 4], [3, 0, 3], [3, 3, 7], [3, 4, 4],
-  [3, 6, 1], [4, 1, 6], [4, 2, 9], [4, 6, 7], [4, 7, 8], [5, 2, 1], [5, 4, 6],
-  [5, 5, 9], [5, 8, 5], [6, 0, 1], [6, 4, 8], [6, 6, 3], [6, 8, 6], [7, 5, 6],
-  [7, 7, 9], [7, 8, 1], [8, 0, 2], [8, 1, 4], [8, 5, 1], [8, 6, 5]
-]).
-
-% Evil puzzle.
-evil_puzzle([
-  [0,0,5], [0,1,2], [0,3,3], [0,5,4], [1,3,9], [1,8,5], [2,3,6], [2,6,9],
-  [2,8,2], [3,1,4], [3,6,7], [4,0,3], [4,4,1], [4,8,6], [5,2,8], [5,7,5],
-  [6,0,7], [6,2,4], [6,5,5], [7,0,6], [7,5,8], [8,3,7], [8,5,9], [8,7,3],
-  [8,8,1]
-]).
-
 % https://www.telegraph.co.uk/news/science/science-news/9359579/Worlds-hardest-sudoku-can-you-crack-it.html
 % World's hardest.
 worlds_hardest_sudoku([
   [0,0,8], [1,2,3], [1,3,6], [2,1,7], [2,4,9], [2,6,2], [3,1,5], [3,5,7],
   [4,4,4], [4,5,5], [4,6,7], [5,3,1], [5,7,3], [6,2,1], [6,7,6], [6,8,8],
   [7,2,8], [7,3,5], [7,7,1], [8,1,9], [8,6,4]
+]).
+
+% https://theconversation.com/good-at-sudoku-heres-some-youll-never-complete-5234
+% 17 is the minimum number of bindings needed for a valid puzzle.
+sudoku_17([
+  [0,3,7], [1,0,1], [2,3,4], [2,4,3], [2,6,2], [3,8,6], [4,3,5], [4,5,9],
+  [5,6,4], [5,7,1], [5,8,8], [6,4,8], [6,5,1], [7,2,2], [7,7,5], [8,1,4],
+  [8,6,3]
 ]).
