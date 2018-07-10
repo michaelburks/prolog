@@ -13,7 +13,7 @@ board([
   [_, _, _, _, _, _, _, _, _]
 ]).
 
-% Pretty-print
+% Pretty printing.
 display_board([]).
 display_board([R|Rows]) :-
   display_row(R), nl, display_board(Rows).
@@ -37,54 +37,57 @@ sudoku(B, Bindings) :-
   apply_bindings(B, Bindings),
   write('Sudoku Puzzle:'), nl,
   display_board(B), nl,
-  write('solving...'), nl,
+  write('solving v2...'), nl,
 
-  % center square
-  squares(B, S4, [4]),
-  is_one_through_nine_map(S4),
+  % Gather all the regions.
+  Range = [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  squares(B, Squares, Range),
+  rows(B, Rows, Range),
+  cols(B, Cols, Range),
+  append(Rows, Cols, Lattice),
+  append(Lattice, Squares, AllRegions),
 
-  % middle three rows
-  rows(B, R345, [3,4,5]),
-  is_one_through_nine_map(R345),
-
-  % middle three columns
-  cols(B, C345, [3,4,5]),
-  is_one_through_nine_map(C345),
-
-  % edge squares
-  squares(B, S1357, [1,3,5,7]),
-  is_one_through_nine_map(S1357),
-
-  % top three rows
-  rows(B, R012, [0,1,2]),
-  is_one_through_nine_map(R012),
-
-  % left three columns
-  cols(B, C012, [0,1,2]),
-  is_one_through_nine_map(C012),
-
-  % top left square
-  squares(B, S0, [0]),
-  is_one_through_nine_map(S0),
-
-  % top right, bottom left squares
-  squares(B, S26, [2,6]),
-  is_one_through_nine_map(S26),
-
-  % bottom three rows
-  rows(B, R678, [6,7,8]),
-  is_one_through_nine_map(R678),
-
-  % right three columns
-  cols(B, C678, [6,7,8]),
-  is_one_through_nine_map(C678),
-
-  % bottom right square
-  squares(B, S8, [8]),
-  is_one_through_nine_map(S8),
-
+  % Fill in regions.
+  fill_in(AllRegions),
   write('Solution:'), nl,
   display_board(B).
+
+
+% Fill the region with the most numbers (least variables) and repeat.
+fill_in([]).
+fill_in(AllRegions) :-
+  most_constrained(AllRegions, Best, Others),
+  length(Others, OL),
+  write(OL), nl, % Write length of remaining to loosely display progress.
+  is_one_through_nine(Best),
+  fill_in(Others).
+
+most_constrained([X], X, []).
+most_constrained([First|Rest], Best, Other) :-
+  count_numbers(First, FC),
+  mc_helper(Rest, Best, Other, First, [], FC).
+
+mc_helper([], Best, Other, Best, Other, _).
+
+mc_helper([Next|Rest], BestF, OtherF, Best, OAcc, BC) :-
+  count_numbers(Next, NC),
+  NC > BC,
+  mc_helper(Rest, BestF, OtherF, Next, [Best | OAcc], NC).
+
+mc_helper([Next|Rest], BestF, OtherF, Best, OAcc, BC) :-
+  count_numbers(Next, NC),
+  not(NC > BC),
+  mc_helper(Rest, BestF, OtherF, Best, [Next | OAcc], BC).
+
+count_numbers([], 0).
+count_numbers([X|R], C) :-
+  number(X),
+  count_numbers(R, RC),
+  C is RC + 1.
+
+count_numbers([X|R], C) :-
+  not(number(X)),
+  count_numbers(R, C).
 
 % Applies [Row, Column, Value] bindings to board.
 apply_bindings(_, []).
