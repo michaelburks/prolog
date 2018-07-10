@@ -92,49 +92,36 @@ apply_bindings(B, [[R, C, V]|Rest]) :-
   index(B, V, R, C),
   apply_bindings(B, Rest).
 
-% Rows in board for indexes I.
+% Gets regions at indexes.
+regions(_, R, R, [], _).
+regions(B, Regions, Acc, [Idx|Idxs], RegFunc) :-
+   call(RegFunc, Idx, Is),
+   values_at_index_list(B, Vs, Is),
+   append(Acc, [Vs], AccN),
+   regions(B, Regions, AccN, Idxs, RegFunc).
+
+% Rows in board for indexes in I.
 rows(_, [], []).
 rows(B, R, I) :-
-  rows_h(B, R, [], I).
+  regions(B, R, [], I, row_indexes).
 
-rows_h(_, R, R, []).
-rows_h(B, R, Acc, [Idx|Idxs]) :-
-  row_index_list(Idx, Is),
-  values_at_index_list(B, Vs, Is),
-  append(Acc, [Vs], AccN),
-  rows_h(B, R, AccN, Idxs).
-
-row_index_list(R, Is) :-
+row_indexes(R, Is) :-
   Is = [[R, 0], [R, 1], [R, 2], [R, 3], [R, 4], [R, 5], [R, 6], [R, 7], [R, 8]].
 
-% Columns in board for indexes I.
+% Columns in board for indexes in I.
 cols(_, [], []).
 cols(B, C, I) :-
-  cols_h(B, C, [], I).
+  regions(B, C, [], I, col_indexes).
 
-cols_h(_, C, C, []).
-cols_h(B, C, Acc, [Idx|Idxs]) :-
-  col_index_list(Idx, Is),
-  values_at_index_list(B, Vs, Is),
-  append(Acc, [Vs], AccN),
-  cols_h(B, C, AccN, Idxs).
-
-col_index_list(C, Is) :-
+col_indexes(C, Is) :-
   Is = [[0, C], [1, C], [2, C], [3, C], [4, C], [5, C], [6, C], [7, C], [8, C]].
 
-% Squares in board for indexes I.
+% Squares in board for indexes in I.
 squares(_, [], []).
 squares(B, S, I) :-
-  squares_h(B, S, [], I).
+  regions(B, S, [], I, square_indexes).
 
-squares_h(_, S, S, []).
-squares_h(B, S, Acc, [Idx|Idxs]) :-
-  square_index_list(Idx, Is),
-  values_at_index_list(B, Vs, Is),
-  append(Acc, [Vs], AccN),
-  squares_h(B, S, AccN, Idxs).
-
-square_index_list(S, Is) :-
+square_indexes(S, Is) :-
   TR is 3 * mod(S, 3), MR is TR + 1, BR is TR + 2,
   LC is S - mod(S, 3), MC is LC + 1, RC is LC + 2,
   Is = [[TR, LC], [TR, MC], [TR, RC],
