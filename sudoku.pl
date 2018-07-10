@@ -46,9 +46,11 @@ display_cell(X) :-
 % Example Invocation:
 % ?- puzzle_1(P), sudoku(X, P).
 sudoku(B, Bindings) :-
+  statistics(walltime, _),
+
   board(B),
-  apply_bindings(B, Bindings), nl,
-  write('Sudoku Puzzle:'), nl,
+  apply_bindings(B, Bindings),
+  nl, write('Sudoku Puzzle:'), nl,
   display_board(B), nl,
 
   % Gather all the regions.
@@ -62,18 +64,26 @@ sudoku(B, Bindings) :-
   % Fill in regions.
   fill_in(AllRegions),
   write('Solution:'), nl,
-  display_board(B), nl.
+  display_board(B), nl, nl,
+
+  statistics(walltime, [_| [ElapsedTimeMs]]),
+  ElapsedTimeSec is ElapsedTimeMs / 1000,
+  write('Time elapsed: '), write(ElapsedTimeSec), write(' seconds'), nl.
 
 
 % Fill the region with the most numbers (least variables) and repeat.
-fill_in([]).
+fill_in([]):-
+  write('\r  '), nl.
 fill_in(AllRegions) :-
   most_constrained(AllRegions, Best, Others),
   length(Others, OL),
    % Write length of remaining to loosely display progress.
-  write(OL), write('     \r'),
+  write('\r'), write_two_digits(OL), write(' '),
   is_one_through_nine(Best),
   fill_in(Others).
+
+write_two_digits(N) :- N < 10, write(0), write(N).
+write_two_digits(N) :- not(N < 10), write(N).
 
 most_constrained([X], X, []).
 most_constrained([First|Rest], Best, Other) :-
@@ -181,10 +191,17 @@ is_one_through_nine(L) :-
   member(9, L).
 
 % Samples
-puzzle_1([
+easy_puzzle([
   [0, 2, 4], [0, 3, 8], [0, 7, 1], [0, 8, 7], [1, 0, 6], [1, 1, 7], [1, 3, 9],
   [2, 0, 5], [2, 2, 8], [2, 4, 3], [2, 8, 4], [3, 0, 3], [3, 3, 7], [3, 4, 4],
   [3, 6, 1], [4, 1, 6], [4, 2, 9], [4, 6, 7], [4, 7, 8], [5, 2, 1], [5, 4, 6],
   [5, 5, 9], [5, 8, 5], [6, 0, 1], [6, 4, 8], [6, 6, 3], [6, 8, 6], [7, 5, 6],
   [7, 7, 9], [7, 8, 1], [8, 0, 2], [8, 1, 4], [8, 5, 1], [8, 6, 5]
+]).
+
+evil_puzzle([
+  [0,0,5], [0,1,2], [0,3,3], [0,5,4], [1,3,9], [1,8,5], [2,3,6], [2,6,9],
+  [2,8,2], [3,1,4], [3,6,7], [4,0,3], [4,4,1], [4,8,6], [5,2,8], [5,7,5],
+  [6,0,7], [6,2,4], [6,5,5], [7,0,6], [7,5,8], [8,3,7], [8,5,9], [8,7,3],
+  [8,8,1]
 ]).
