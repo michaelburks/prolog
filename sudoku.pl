@@ -14,11 +14,24 @@ board([
 ]).
 
 % Pretty printing.
+is_3_or_6(3).
+is_3_or_6(6).
+
 display_board([]).
+
+% Insert row breaks.
+display_board(R) :-
+  length(R, L), is_3_or_6(L), write('-------+-------+-------'), nl, false.
+
 display_board([R|Rows]) :-
-  display_row(R), nl, display_board(Rows).
+ write(' '), display_row(R), nl, display_board(Rows).
 
 display_row([]).
+
+% Insert column breaks.
+display_row(C) :-
+  length(C, L), is_3_or_6(L), write('| '), false.
+
 display_row([C|Cells]) :-
   display_cell(C), write(' '), display_row(Cells).
 
@@ -34,7 +47,7 @@ display_cell(X) :-
 % ?- puzzle_1(P), sudoku(X, P).
 sudoku(B, Bindings) :-
   board(B),
-  apply_bindings(B, Bindings),
+  apply_bindings(B, Bindings), nl,
   write('Sudoku Puzzle:'), nl,
   display_board(B), nl,
 
@@ -49,7 +62,7 @@ sudoku(B, Bindings) :-
   % Fill in regions.
   fill_in(AllRegions),
   write('Solution:'), nl,
-  display_board(B).
+  display_board(B), nl.
 
 
 % Fill the region with the most numbers (least variables) and repeat.
