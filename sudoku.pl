@@ -172,12 +172,7 @@ index([_|Rows], K, R, C) :-
   Rd is R - 1,
   index(Rows, K, Rd, C).
 
-% Evaluates that each element is a list containing one each of the digits 1-9.
-is_one_through_nine_map([]).
-is_one_through_nine_map([Z|Rest]) :-
-  is_one_through_nine(Z),
-  is_one_through_nine_map(Rest).
-
+% Checks that L is list containing one each of the digits 1-9.
 is_one_through_nine(L) :-
   length(L, 9),
   member(1, L),
@@ -190,7 +185,8 @@ is_one_through_nine(L) :-
   member(8, L),
   member(9, L).
 
-% Samples
+% Sample puzzles.
+% Easy puzzle takes <2 seconds to solve.
 easy_puzzle([
   [0, 2, 4], [0, 3, 8], [0, 7, 1], [0, 8, 7], [1, 0, 6], [1, 1, 7], [1, 3, 9],
   [2, 0, 5], [2, 2, 8], [2, 4, 3], [2, 8, 4], [3, 0, 3], [3, 3, 7], [3, 4, 4],
@@ -199,6 +195,7 @@ easy_puzzle([
   [7, 7, 9], [7, 8, 1], [8, 0, 2], [8, 1, 4], [8, 5, 1], [8, 6, 5]
 ]).
 
+% Evil puzzle takes ~3 minutes to solve.
 evil_puzzle([
   [0,0,5], [0,1,2], [0,3,3], [0,5,4], [1,3,9], [1,8,5], [2,3,6], [2,6,9],
   [2,8,2], [3,1,4], [3,6,7], [4,0,3], [4,4,1], [4,8,6], [5,2,8], [5,7,5],
