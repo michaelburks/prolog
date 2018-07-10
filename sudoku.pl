@@ -31,13 +31,12 @@ display_cell(X) :-
 % Main.
 % B is the complete grid. Bindings is a list of [Row, Column, Value] lists.
 % Example Invocation:
-% ?- sudoku(X, [[0,0,1], [4, 4, 9], ..., [8, 8, 6]]).
+% ?- puzzle_1(P), sudoku(X, P).
 sudoku(B, Bindings) :-
   board(B),
   apply_bindings(B, Bindings),
   write('Sudoku Puzzle:'), nl,
   display_board(B), nl,
-  write('solving v2...'), nl,
 
   % Gather all the regions.
   Range = [0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -58,7 +57,8 @@ fill_in([]).
 fill_in(AllRegions) :-
   most_constrained(AllRegions, Best, Others),
   length(Others, OL),
-  write(OL), nl, % Write length of remaining to loosely display progress.
+   % Write length of remaining to loosely display progress.
+  write(OL), write('     \r'),
   is_one_through_nine(Best),
   fill_in(Others).
 
@@ -166,3 +166,12 @@ is_one_through_nine(L) :-
   member(7, L),
   member(8, L),
   member(9, L).
+
+% Samples
+puzzle_1([
+  [0, 2, 4], [0, 3, 8], [0, 7, 1], [0, 8, 7], [1, 0, 6], [1, 1, 7], [1, 3, 9],
+  [2, 0, 5], [2, 2, 8], [2, 4, 3], [2, 8, 4], [3, 0, 3], [3, 3, 7], [3, 4, 4],
+  [3, 6, 1], [4, 1, 6], [4, 2, 9], [4, 6, 7], [4, 7, 8], [5, 2, 1], [5, 4, 6],
+  [5, 5, 9], [5, 8, 5], [6, 0, 1], [6, 4, 8], [6, 6, 3], [6, 8, 6], [7, 5, 6],
+  [7, 7, 9], [7, 8, 1], [8, 0, 2], [8, 1, 4], [8, 5, 1], [8, 6, 5]
+]).
