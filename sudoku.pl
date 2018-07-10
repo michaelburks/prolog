@@ -1,5 +1,28 @@
 % Sudoku Solver
 
+% Shorthand for solving a sample puzzle.
+% ?- solve_puzzle(worlds_hardest_sudoku).
+solve_puzzle(S) :-
+  call(S, P),
+  sudoku(_, P).
+
+% Sample puzzles.
+% https://www.telegraph.co.uk/news/science/science-news/9359579/Worlds-hardest-sudoku-can-you-crack-it.html
+% World's hardest.
+worlds_hardest_sudoku([
+  [0,0,8], [1,2,3], [1,3,6], [2,1,7], [2,4,9], [2,6,2], [3,1,5], [3,5,7],
+  [4,4,4], [4,5,5], [4,6,7], [5,3,1], [5,7,3], [6,2,1], [6,7,6], [6,8,8],
+  [7,2,8], [7,3,5], [7,7,1], [8,1,9], [8,6,4]
+]).
+
+% https://theconversation.com/good-at-sudoku-heres-some-youll-never-complete-5234
+% 17 is the minimum number of bindings needed for a valid puzzle.
+sudoku_17([
+  [0,3,7], [1,0,1], [2,3,4], [2,4,3], [2,6,2], [3,8,6], [4,3,5], [4,5,9],
+  [5,6,4], [5,7,1], [5,8,8], [6,4,8], [6,5,1], [7,2,2], [7,7,5], [8,1,4],
+  [8,6,3]
+]).
+
 % Instantiate the 9 x 9 board.
 board([
   [_, _, _, _, _, _, _, _, _],
@@ -207,20 +230,3 @@ verify_legal_bindings_set([X|Rest], N) :-
 verify_legal_bindings_set([X|Rest], N) :-
   not(number(X)),
   verify_legal_bindings_set(Rest, N).
-
-% Sample puzzles.
-% https://www.telegraph.co.uk/news/science/science-news/9359579/Worlds-hardest-sudoku-can-you-crack-it.html
-% World's hardest.
-worlds_hardest_sudoku([
-  [0,0,8], [1,2,3], [1,3,6], [2,1,7], [2,4,9], [2,6,2], [3,1,5], [3,5,7],
-  [4,4,4], [4,5,5], [4,6,7], [5,3,1], [5,7,3], [6,2,1], [6,7,6], [6,8,8],
-  [7,2,8], [7,3,5], [7,7,1], [8,1,9], [8,6,4]
-]).
-
-% https://theconversation.com/good-at-sudoku-heres-some-youll-never-complete-5234
-% 17 is the minimum number of bindings needed for a valid puzzle.
-sudoku_17([
-  [0,3,7], [1,0,1], [2,3,4], [2,4,3], [2,6,2], [3,8,6], [4,3,5], [4,5,9],
-  [5,6,4], [5,7,1], [5,8,8], [6,4,8], [6,5,1], [7,2,2], [7,7,5], [8,1,4],
-  [8,6,3]
-]).
