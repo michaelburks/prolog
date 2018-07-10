@@ -44,7 +44,7 @@ display_cell(X) :-
 % Main.
 % B is the complete grid. Bindings is a list of [Row, Column, Value] lists.
 % Example Invocation:
-% ?- puzzle_1(P), sudoku(X, P).
+% ?- easy_puzzle(P), sudoku(X, P).
 sudoku(B, Bindings) :-
   statistics(walltime, _),
 
@@ -54,12 +54,7 @@ sudoku(B, Bindings) :-
   display_board(B), nl,
 
   % Gather all the regions.
-  Range = [0, 1, 2, 3, 4, 5, 6, 7, 8],
-  squares(B, Squares, Range),
-  rows(B, Rows, Range),
-  cols(B, Cols, Range),
-  append(Rows, Cols, Lattice),
-  append(Lattice, Squares, AllRegions),
+  regions(B, AllRegions),
 
   % Fill in regions.
   fill_in(AllRegions),
@@ -71,6 +66,15 @@ sudoku(B, Bindings) :-
   write('Time elapsed: '), write(ElapsedTimeSec), write(' seconds'), nl.
 
 
+regions(B, R) :-
+  % Gather all the regions.
+  Range = [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  squares(B, Squares, Range),
+  rows(B, Rows, Range),
+  cols(B, Cols, Range),
+  append(Rows, Cols, Lattice),
+  append(Lattice, Squares, R).
+
 % Fill the region with the most numbers (least variables) and repeat.
 fill_in([]):-
   write('\r  '), nl.
@@ -80,6 +84,7 @@ fill_in(AllRegions) :-
    % Write length of remaining to loosely display progress.
   write('\r'), write_two_digits(OL), write(' '),
   is_one_through_nine(Best),
+  verify_regions(Others),
   fill_in(Others).
 
 write_two_digits(N) :- N < 10, write(0), write(N).
@@ -185,8 +190,24 @@ is_one_through_nine(L) :-
   member(8, L),
   member(9, L).
 
+% check all bindings
+verify_regions([]).
+verify_regions([R|Rest]) :-
+  verify_legal_bindings_set(R, []),
+  verify_regions(Rest).
+
+verify_legal_bindings_set([], _).
+verify_legal_bindings_set([X|Rest], N) :-
+  number(X),
+  not(member(X, N)),
+  verify_legal_bindings_set(Rest, [X|N]).
+
+verify_legal_bindings_set([X|Rest], N) :-
+  not(number(X)),
+  verify_legal_bindings_set(Rest, N).
+
 % Sample puzzles.
-% Easy puzzle takes <2 seconds to solve.
+% Easy puzzle.
 easy_puzzle([
   [0, 2, 4], [0, 3, 8], [0, 7, 1], [0, 8, 7], [1, 0, 6], [1, 1, 7], [1, 3, 9],
   [2, 0, 5], [2, 2, 8], [2, 4, 3], [2, 8, 4], [3, 0, 3], [3, 3, 7], [3, 4, 4],
@@ -195,7 +216,7 @@ easy_puzzle([
   [7, 7, 9], [7, 8, 1], [8, 0, 2], [8, 1, 4], [8, 5, 1], [8, 6, 5]
 ]).
 
-% Evil puzzle takes ~3 minutes to solve.
+% Evil puzzle.
 evil_puzzle([
   [0,0,5], [0,1,2], [0,3,3], [0,5,4], [1,3,9], [1,8,5], [2,3,6], [2,6,9],
   [2,8,2], [3,1,4], [3,6,7], [4,0,3], [4,4,1], [4,8,6], [5,2,8], [5,7,5],
@@ -204,7 +225,7 @@ evil_puzzle([
 ]).
 
 % https://www.telegraph.co.uk/news/science/science-news/9359579/Worlds-hardest-sudoku-can-you-crack-it.html
-% Takes >2.5 hours to solve.
+% World's hardest.
 worlds_hardest_sudoku([
   [0,0,8], [1,2,3], [1,3,6], [2,1,7], [2,4,9], [2,6,2], [3,1,5], [3,5,7],
   [4,4,4], [4,5,5], [4,6,7], [5,3,1], [5,7,3], [6,2,1], [6,7,6], [6,8,8],
