@@ -89,7 +89,7 @@ chord(N, [diminished, 7]) :-
   interval(Root, Fifth, 6),
   interval(Root, Seventh, 9).
 
-chord(_, [unknown]).
+% chord(_, [unknown]).
 
 triad(Root, Third, Fifth, Q) :-
   chord([Root, Third, Fifth], Q).
@@ -139,11 +139,13 @@ progression([predominant, _], [dominant, 5]).
 
 progression([dominant, 5], [tonic, 1]).
 
+progression(X, X).
+
 % analysis
 % Example:
 % ?- analyze([[g,d,b], [c,e,g], [c,e,a], [c,d,f_sharp,a], [b,d,g]], A).
-analyze([], []).
-analyze([Notes|Rest], A) :-
+analyze([], _, []).
+analyze([Notes|Rest], [S,Q], A) :-
   permutation(Notes, [CR|CRest]),
   chord([CR|CRest], CQ),
   function(S, Q, CR, CQ, CF),
