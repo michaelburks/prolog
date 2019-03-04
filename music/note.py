@@ -31,3 +31,9 @@ class Frame:
     self.index = index
     self.notes = list(notes)
     self.function = 'C{0}'.format(index)
+
+  def __repr__(self):
+    return "Frame({0},{1})".format(self.notes, self.function)
+
+  def __str__(self):
+    return repr(self)
